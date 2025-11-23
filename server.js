@@ -1,12 +1,24 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const session = require("express-session");
+
 const app = express();
 const port = 3000;
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Session
+app.use(
+  session({
+    secret: "supersecret",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -18,10 +30,12 @@ app.use('/', authRoutes);
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
 
-// 🔹 Tambahkan route default (ini solusi untuk Cannot GET /)
+// Default route
 app.get('/', (req, res) => {
-  res.redirect('/login'); // atau bisa diganti '/register' kalau mau
+  res.redirect('/admin/login-page');
 });
 
-// Jalankan server
-app.listen(port, () => console.log(`🚀 Server running at http://localhost:${port}`));
+// Start server
+app.listen(port, () =>
+  console.log(`🚀 Server running at http://localhost:${port}`)
+);
