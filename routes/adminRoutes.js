@@ -1,11 +1,16 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const adminController = require('../controllers/adminController');
+const adminController = require("../controllers/adminController");
+const adminAuth = require("../middleware/adminAuth");
 
-// Halaman HTML dashboard admin
-router.get('/dashboard', adminController.dashboard);
+// Login
+router.get("/login", adminController.loginPage);
+router.post("/login", adminController.login);
 
-// API untuk fetch data user (dipanggil oleh dashboard_admin.html)
-router.get('/data', adminController.getAllUsers);
+// Dashboard (protected)
+router.get("/dashboard", adminAuth, adminController.dashboard);
+
+// Logout
+router.get("/logout", adminAuth, adminController.logout);
 
 module.exports = router;
