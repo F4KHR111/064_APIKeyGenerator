@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Inter", sans-serif;
+            background: radial-gradient(circle at top, #0f172a, #020617);
+            color: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .card {
+            width: 90%;
+            max-width: 550px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(14px);
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 8px 35px rgba(0, 0, 0, 0.45);
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            margin-top: 0;
+            text-align: center;
+            font-weight: 600;
+            font-size: 22px;
+        }
+
+        label {
+            margin-top: 15px;
+            display: block;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border-radius: 10px;
+            border: 1px solid #1e293b;
+            background: #0f172a;
+            color: #e2e8f0;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #6366f1;
+            outline: none;
+        }
+
+        input[readonly] {
+            opacity: 0.85;
+        }
+
+        .api-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 18px;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+        #generateBtn {
+            background: #6d28d9;
+            color: white;
+        }
+
+        #generateBtn:disabled {
+            background: #4b5563;
+            cursor: not-allowed;
+        }
+
+        #copyBtn {
+            background: #1d4ed8;
+            color: white;
+        }
+
+        #saveBtn {
+            background: #16a34a;
+            color: white;
+        }
+
+        /* Popup */
+        #popup {
+            position: fixed;
+            inset: 0;
+            backdrop-filter: blur(3px);
+            background: rgba(0,0,0,0.55);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-box {
+            background: rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 25px 35px;
+            color: #e2e8f0;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            animation: zoomIn 0.25s ease-out;
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.85); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .popup-btn {
+            margin-top: 18px;
+            background: #6366f1;
+            padding: 10px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Dashboard User</h2>
+
+    <input type="hidden" id="userId" value="<%= user.id %>">
+
+    <label>First Name</label>
+    <input type="text" id="firstName" value="<%= user.first_name %>" placeholder="Input first name">
+
+    <label>Last Name</label>
+    <input type="text" id="lastName" value="<%= user.last_name %>" placeholder="Input last name">
+
+    <label>Email</label>
+    <input type="email" id="email" value="<%= user.email %>" placeholder="Input email">
+
+    <label>API Key</label>
+
+    <div class="api-box">
+        <input type="text" id="apiKey" readonly value="<%= user.key || '' %>">
+    </div>
+
+    <button type="button" id="generateBtn" <%= user.key ? "disabled" : "" %>>Generate API Key</button>
+    <button type="button" id="copyBtn">Copy API Key</button>
+    <button type="button" id="saveBtn">SAVE</button>
+</div>
+
+<!-- POPUP -->
+<div id="popup">
+    <div class="popup-box">
+        <h3>✔ Data Berhasil Disimpan!</h3>
+        <p>Your profile has been successfully updated.</p>
+        <button class="popup-btn" onclick="closePopup()">OK</button>
+    </div>
+</div>
+
+<script>
+    const generateBtn = document.getElementById("generateBtn");
+    const copyBtn = document.getElementById("copyBtn");
+    const apiKeyInput = document.getElementById("apiKey");
+
+    // ------- GENERATE API KEY -------
+    generateBtn && generateBtn.addEventListener("click", () => {
+        if (apiKeyInput.value.trim() !== "") return;
+
+        const api = [...Array(32)]
+            .map(() => Math.floor(Math.random() * 16).toString(16))
+            .join("");
+
+        apiKeyInput.value = api;
+        generateBtn.disabled = true;
+    });
+
+    // ------- COPY API KEY -------
+    copyBtn.addEventListener("click", () => {
+        navigator.clipboard.writeText(apiKeyInput.value);
+        copyBtn.innerText = "Copied!";
+        setTimeout(() => copyBtn.innerText = "Copy API Key", 1500);
+    });
+
+    // ------- SAVE AJAX -------
+    document.getElementById("saveBtn").addEventListener("click", () => {
+        const data = {
+            userId: document.getElementById("userId").value,
+            first_name: document.getElementById("firstName").value,
+            last_name: document.getElementById("lastName").value,
+            email: document.getElementById("email").value,
+            api_key: document.getElementById("apiKey").value
+        };
+
+        fetch("/user/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) showPopup();
+        });
+    });
+
+    function showPopup() {
+        document.getElementById("popup").style.display = "flex";
+    }
+
+    function closePopup() {
+        document.getElementById("popup").style.display = "none";
+    }
+</script>
+
+</body>
+</html>

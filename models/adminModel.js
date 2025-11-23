@@ -1,0 +1,9 @@
+const db = require('../config/db');
+
+const Admin = {
+  findByEmail: (email, callback) => {
+    db.query('SELECT * FROM Admin WHERE email = ?', [email], callback);
+  }
+};
+
+module.exports = Admin;
