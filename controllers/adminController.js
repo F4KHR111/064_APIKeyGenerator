@@ -1,5 +1,5 @@
 const db = require('../config/db');
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 // =================== LOGIN ===================
 exports.login = (req, res) => {
@@ -13,7 +13,7 @@ exports.login = (req, res) => {
 
         const admin = result[0];
 
-        const validPass = bcrypt.compareSync(password, admin.password);
+        const validPass = bcrypt.compare(password, admin.password);
         if (!validPass)
             return res.send("Password salah");
 
