@@ -21,11 +21,11 @@
         .card {
             width: 90%;
             max-width: 550px;
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(14px);
-            border-radius: 18px;
-            padding: 30px;
-            box-shadow: 0 8px 35px rgba(0, 0, 0, 0.45);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 10px 45px rgba(0, 0, 0, 0.45);
             animation: fadeIn 0.25s ease-out;
         }
 
@@ -35,14 +35,15 @@
         }
 
         h2 {
-            margin-top: 0;
             text-align: center;
-            font-weight: 600;
-            font-size: 22px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: .5px;
         }
 
         label {
-            margin-top: 15px;
+            margin-top: 16px;
             display: block;
             font-size: 14px;
             color: #94a3b8;
@@ -52,12 +53,12 @@
             width: 100%;
             padding: 12px;
             margin-top: 6px;
-            border-radius: 10px;
+            border-radius: 12px;
             border: 1px solid #1e293b;
             background: #0f172a;
-            color: #e2e8f0;
+            color: #f1f5f9;
             font-size: 15px;
-            transition: 0.2s;
+            transition: 0.25s ease;
         }
 
         input:focus {
@@ -66,40 +67,53 @@
         }
 
         input[readonly] {
-            opacity: 0.85;
+            opacity: .9;
         }
 
         .api-box {
             display: flex;
-            gap: 10px;
+            align-items: center;
             margin-top: 6px;
+            gap: 10px;
+        }
+
+        .copy-icon {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            background: #1e40af;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .copy-icon:hover {
+            background: #1d4ed8;
         }
 
         button {
             width: 100%;
             margin-top: 18px;
-            padding: 12px;
+            padding: 13px;
             border: none;
             border-radius: 12px;
             font-size: 15px;
             cursor: pointer;
             font-weight: 600;
-            transition: 0.2s ease;
+            transition: 0.25s;
         }
 
         #generateBtn {
-            background: #6d28d9;
+            background: #7c3aed;
             color: white;
         }
 
         #generateBtn:disabled {
             background: #4b5563;
             cursor: not-allowed;
-        }
-
-        #copyBtn {
-            background: #1d4ed8;
-            color: white;
         }
 
         #saveBtn {
@@ -111,7 +125,7 @@
         #popup {
             position: fixed;
             inset: 0;
-            backdrop-filter: blur(3px);
+            backdrop-filter: blur(4px);
             background: rgba(0,0,0,0.55);
             display: none;
             justify-content: center;
@@ -119,18 +133,12 @@
         }
 
         .popup-box {
-            background: rgba(255,255,255,0.06);
-            border-radius: 16px;
-            padding: 25px 35px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 18px;
+            padding: 30px 40px;
             color: #e2e8f0;
             text-align: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-            animation: zoomIn 0.25s ease-out;
-        }
-
-        @keyframes zoomIn {
-            from { opacity: 0; transform: scale(0.85); }
-            to { opacity: 1; transform: scale(1); }
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
         }
 
         .popup-btn {
@@ -142,7 +150,6 @@
             cursor: pointer;
             border: none;
         }
-
     </style>
 </head>
 <body>
@@ -150,25 +157,34 @@
 <div class="card">
     <h2>Dashboard User</h2>
 
-    <input type="hidden" id="userId" value="<%= user.id %>">
+    <input type="hidden" id="userId" value="">
 
     <label>First Name</label>
-    <input type="text" id="firstName" value="<%= user.first_name %>" placeholder="Input first name">
+    <input type="text" id="firstName" value="">
 
     <label>Last Name</label>
-    <input type="text" id="lastName" value="<%= user.last_name %>" placeholder="Input last name">
+    <input type="text" id="lastName" value="">
 
     <label>Email</label>
-    <input type="email" id="email" value="<%= user.email %>" placeholder="Input email">
+    <input type="email" id="email" value="">
 
     <label>API Key</label>
 
     <div class="api-box">
-        <input type="text" id="apiKey" readonly value="<%= user.key || '' %>">
+        <input type="text" id="apiKey" readonly value="">
+
+        <!-- ICON COPY BUTTON -->
+        <div id="copyBtn" class="copy-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4
+                         a2 2 0 0 1 2-2h9
+                         a2 2 0 0 1 2 2v1"></path>
+            </svg>
+        </div>
     </div>
 
-    <button type="button" id="generateBtn" <%= user.key ? "disabled" : "" %>>Generate API Key</button>
-    <button type="button" id="copyBtn">Copy API Key</button>
+    <button type="button" id="generateBtn" <%= user.key ? "disabled" : "" %>Generate API Key</button>
     <button type="button" id="saveBtn">SAVE</button>
 </div>
 
@@ -187,7 +203,7 @@
     const apiKeyInput = document.getElementById("apiKey");
 
     // ------- GENERATE API KEY -------
-    generateBtn && generateBtn.addEventListener("click", () => {
+    generateBtn?.addEventListener("click", () => {
         if (apiKeyInput.value.trim() !== "") return;
 
         const api = [...Array(32)]
@@ -198,14 +214,17 @@
         generateBtn.disabled = true;
     });
 
-    // ------- COPY API KEY -------
+    // ------- COPY API KEY (ICON) -------
     copyBtn.addEventListener("click", () => {
         navigator.clipboard.writeText(apiKeyInput.value);
-        copyBtn.innerText = "Copied!";
-        setTimeout(() => copyBtn.innerText = "Copy API Key", 1500);
+        copyBtn.style.background = "#059669";
+
+        setTimeout(() => {
+            copyBtn.style.background = "#1e40af";
+        }, 1200);
     });
 
-    // ------- SAVE AJAX -------
+    // ------- SAVE -------
     document.getElementById("saveBtn").addEventListener("click", () => {
         const data = {
             userId: document.getElementById("userId").value,
