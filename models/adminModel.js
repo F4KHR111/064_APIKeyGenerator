@@ -1,9 +1,9 @@
 const db = require('../config/db');
 
-const Admin = {
-  findByEmail: (email, callback) => {
-    db.query('SELECT * FROM Admin WHERE email = ?', [email], callback);
-  }
+exports.createAdmin = (email, password, callback) => {
+  db.query('INSERT INTO admin (email, password) VALUES (?, ?)', [email, password], callback);
 };
 
-module.exports = Admin;
+exports.findAdminByEmail = (email, callback) => {
+  db.query('SELECT * FROM admin WHERE email = ?', [email], callback);
+};
